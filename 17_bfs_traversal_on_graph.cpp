@@ -5,52 +5,50 @@ using namespace std;
 
 int main()
 {
-    int V, E;
-    cin >> V >> E;
-    vector<vector<int>> g(V);
-    for (int i = 0; i < E; i++)
+    int vertices, edges;
+    cout << "Enter number of vertices and edges: ";
+    cin >> vertices >> edges;
+    vector<vector<int>> graph(vertices);
+    for (int i = 0; i < edges; i++)
     {
         int u, v;
+        cout << "Enter edge " << (i+1) << " (u v): ";
         cin >> u >> v;
-        if (u >= 0 && u < V && v >= 0 && v < V)
-        {
-            g[u].push_back(v);
-            g[v].push_back(u);
-        }
+        graph[u].push_back(v);
+        graph[v].push_back(u);
     }
-    int s;
-    cin >> s;
-    vector<int> vis(V, 0);
+    int start;
+    cout << "Enter starting vertex: ";
+    cin >> start;
+    vector<int> visited(vertices, 0);
     queue<int> q;
-    if (s >= 0 && s < V)
-    {
-        vis[s] = 1;
-        q.push(s);
-    }
+    visited[start] = 1;
+    q.push(start);
+    cout << "\nBFS Traversal: ";
     while (!q.empty())
     {
-        int u = q.front();
+        int current = q.front();
         q.pop();
-        cout << u << ' ';
-        for (int v : g[u])
-            if (!vis[v])
+        cout << current << " ";
+        for (int neighbor : graph[current])
+        {
+            if (visited[neighbor] == 0)
             {
-                vis[v] = 1;
-                q.push(v);
+                visited[neighbor] = 1;
+                q.push(neighbor);
             }
+        }
     }
-    cout << "\n";
     return 0;
 }
-
 
 // Time Complexity: O(V + E)
 // Space Complexity: O(V)
 
 // Example Input:
-// 4 4
-// 0 1
-// 1 2
-// 2 3
-// 3 0
-// 0
+// Enter number of vertices and edges: 4 4
+// Enter edge 1 (u v): 0 1
+// Enter edge 2 (u v): 1 2
+// Enter edge 3 (u v): 2 3
+// Enter edge 4 (u v): 3 0
+// Enter starting vertex: 0

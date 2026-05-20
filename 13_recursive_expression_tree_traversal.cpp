@@ -1,111 +1,105 @@
 #include <iostream>
-#include <sstream>
 #include <stack>
-#include <string>
 using namespace std;
 
 struct Node
 {
-    string val;
-    Node *left;
-    Node *right;
-    Node(string v) : val(std::move(v)), left(nullptr), right(nullptr) {}
+    char data;
+    Node* left;
+    Node* right;
+
+    Node(char value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-bool isOp(const string &t)
+bool isOperator(char ch)
 {
-    return t.size() == 1 && (t[0] == '+' || t[0] == '-' || t[0] == '*' || t[0] == '/' || t[0] == '^');
+    return ch == '+' || ch == '-' || ch == '*' || ch == '/';
 }
 
-Node *build(const string &line)
+Node* buildTree(string exp)
 {
-    stack<Node *> st;
-    if (line.find(' ') != string::npos)
+    stack<Node*> st;
+
+    for (char ch : exp)
     {
-        stringstream ss(line);
-        string t;
-        while (ss >> t)
+        if (!isOperator(ch))
         {
-            if (!isOp(t))
-                st.push(new Node(t));
-            else
-            {
-                Node *r = st.top();
-                st.pop();
-                Node *l = st.top();
-                st.pop();
-                Node *op = new Node(t);
-                op->left = l;
-                op->right = r;
-                st.push(op);
-            }
+            st.push(new Node(ch));
+        }
+
+        else
+        {
+            Node* right = st.top();
+            st.pop();
+
+            Node* left = st.top();
+            st.pop();
+
+            Node* op = new Node(ch);
+
+            op->left = left;
+            op->right = right;
+
+            st.push(op);
         }
     }
-    else
-    {
-        for (char c : line)
-        {
-            if (c == ' ' || c == '\t')
-                continue;
-            string t(1, c);
-            if (!isOp(t))
-                st.push(new Node(t));
-            else
-            {
-                Node *r = st.top();
-                st.pop();
-                Node *l = st.top();
-                st.pop();
-                Node *op = new Node(t);
-                op->left = l;
-                op->right = r;
-                st.push(op);
-            }
-        }
-    }
-    return st.empty() ? nullptr : st.top();
+
+    return st.top();
 }
 
-string inorder(Node *r)
+void inorder(Node* root)
 {
-    if (!r)
-        return "";
-    if (!isOp(r->val))
-        return r->val;
-    return "(" + inorder(r->left) + r->val + inorder(r->right) + ")";
+    if (root == NULL)
+        return;
+
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
 }
 
-void preorder(Node *r)
+void preorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    cout << r->val << ' ';
-    preorder(r->left);
-    preorder(r->right);
+
+    cout << root->data << " ";
+    preorder(root->left);
+    preorder(root->right);
 }
-void postorder(Node *r)
+
+void postorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    postorder(r->left);
-    postorder(r->right);
-    cout << r->val << ' ';
+
+    postorder(root->left);
+    postorder(root->right);
+    cout << root->data << " ";
 }
 
 int main()
 {
+    string exp;
+    cout << "Enter expression in postfix notation: ";
+    cin >> exp;
 
-    string line;
-    getline(cin, line);
-    if (line.empty())
-        getline(cin, line);
-    Node *root = build(line);
-    cout << inorder(root) << "\n";
+    Node* root = buildTree(exp);
+
+    cout << "\nInorder: ";
+    inorder(root);
+    cout << endl;
+
+    cout << "Preorder: ";
     preorder(root);
-    cout << "\n";
+    cout << endl;
+
+    cout << "Postorder: ";
     postorder(root);
-    cout << "\n";
-    return 0;
 }
 
 
@@ -113,4 +107,4 @@ int main()
 // Space Complexity: O(H)
 
 // Example Input:
-// ab+c*
+// Enter expression in postfix notation: ab+c*

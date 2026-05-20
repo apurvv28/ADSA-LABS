@@ -3,51 +3,75 @@ using namespace std;
 
 struct Node
 {
-    int key;
-    Node *left;
-    Node *right;
-    Node(int v) : key(v), left(nullptr), right(nullptr) {}
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-Node *insertNode(Node *r, int x)
+Node* insert(Node* root, int value)
 {
-    if (!r)
-        return new Node(x);
-    if (x < r->key)
-        r->left = insertNode(r->left, x);
-    else if (x > r->key)
-        r->right = insertNode(r->right, x);
-    return r;
+    if (root == NULL)
+        return new Node(value);
+
+    if (value < root->data)
+    {
+        root->left = insert(root->left, value);
+    }
+    else if (value > root->data)
+    {
+        root->right = insert(root->right, value);
+    }
+
+    return root;
 }
 
-Node *searchNode(Node *r, int k)
+bool search(Node* root, int key)
 {
-    while (r && r->key != k)
-    {
-        if (k < r->key)
-            r = r->left;
-        else
-            r = r->right;
-    }
-    return r;
+    if (root == NULL)
+        return false;
+
+    if (root->data == key)
+        return true;
+
+    if (key < root->data)
+        return search(root->left, key);
+
+    return search(root->right, key);
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    Node *root = nullptr;
+
+    Node* root = NULL;
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        root = insertNode(root, x);
+        int value;
+        cout << "Enter node " << (i+1) << ": ";
+        cin >> value;
+
+        root = insert(root, value);
     }
+
     int key;
+    cout << "Enter key to search: ";
     cin >> key;
-    cout << (searchNode(root, key) ? "FOUND\n" : "NOT FOUND\n");
-    return 0;
+
+    cout << "\nResult: ";
+    if (search(root, key))
+        cout << "FOUND";
+    else
+        cout << "NOT FOUND";
 }
 
 
@@ -55,6 +79,10 @@ int main()
 // Space Complexity: O(1) or O(H)
 
 // Example Input:
-// 5
-// 5 3 7 1 9
-// 3
+// Enter number of nodes: 5
+// Enter node 1: 5
+// Enter node 2: 3
+// Enter node 3: 7
+// Enter node 4: 1
+// Enter node 5: 9
+// Enter key to search: 3

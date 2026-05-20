@@ -5,75 +5,108 @@ using namespace std;
 
 struct Edge
 {
-    int to;
-    int w;
+    int node;
+    int weight;
 };
 
-int main()
+void prims(int vertices, vector<vector<Edge>> &graph, int start)
 {
-    int V, E;
-    cin >> V >> E;
-    vector<vector<Edge>> g(V);
-    for (int i = 0; i < E; i++)
-    {
-        int u, v, w;
-        cin >> u >> v >> w;
-        if (u >= 0 && u < V && v >= 0 && v < V)
-        {
-            g[u].push_back({v, w});
-            g[v].push_back({u, w});
-        }
-    }
-    int s;
-    cin >> s;
-    if (s < 0 || s >= V)
-        s = 0;
+    vector<int> visited(vertices, 0);
 
-    const long long INF = (1LL << 60);
-    vector<long long> key(V, INF);
-    vector<int> parent(V, -1), used(V, 0);
-    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
-    key[s] = 0;
-    pq.push({0, s});
+    vector<int> key(vertices, 999999);
+
+    vector<int> parent(vertices, -1);
+
+    priority_queue<
+        pair<int, int>,
+        vector<pair<int, int>>,
+        greater<pair<int, int>>>
+        pq;
+
+    key[start] = 0;
+
+    pq.push({0, start});
+
     while (!pq.empty())
     {
-        pair<long long, int> top = pq.top();
+        int current = pq.top().second;
         pq.pop();
-        long long d = top.first;
-        int u = top.second;
-        if (used[u])
+
+        if (visited[current])
             continue;
-        used[u] = 1;
-        for (auto e : g[u])
+
+        visited[current] = 1;
+
+        for (Edge e : graph[current])
         {
-            if (!used[e.to] && e.w < key[e.to])
+            if (!visited[e.node] &&
+                e.weight < key[e.node])
             {
-                key[e.to] = e.w;
-                parent[e.to] = u;
-                pq.push(make_pair(key[e.to], e.to));
+                key[e.node] = e.weight;
+
+                parent[e.node] = current;
+
+                pq.push({key[e.node], e.node});
             }
         }
     }
 
-    long long cost = 0;
-    for (int i = 0; i < V; i++)
-        if (key[i] != INF)
-            cost += key[i];
-    cout << cost << "\n";
-    for (int v = 0; v < V; v++)
-        if (parent[v] != -1)
-            cout << parent[v] << " " << v << " " << key[v] << "\n";
-    return 0;
+    int totalCost = 0;
+
+    for (int i = 0; i < vertices; i++)
+    {
+        totalCost += key[i];
+    }
+
+    cout << "Cost = " << totalCost << endl;
+
+    for (int i = 0; i < vertices; i++)
+    {
+        if (parent[i] != -1)
+        {
+            cout << parent[i]
+                 << " - "
+                 << i
+                 << " = "
+                 << key[i]
+                 << endl;
+        }
+    }
 }
 
+int main()
+{
+    int vertices, edges;
+    cout << "Enter number of vertices and edges: ";
+    cin >> vertices >> edges;
+
+    vector<vector<Edge>> graph(vertices);
+
+    for (int i = 0; i < edges; i++)
+    {
+        int u, v, w;
+        cout << "Enter edge " << (i+1) << " (u v weight): ";
+        cin >> u >> v >> w;
+
+        graph[u].push_back({v, w});
+        graph[v].push_back({u, w});
+    }
+
+    int start;
+    cout << "Enter starting vertex: ";
+    cin >> start;
+
+    prims(vertices, graph, start);
+}
 
 // Time Complexity: O(E log V)
 // Space Complexity: O(V)
 
 // Example Input:
-// 4 5
-// 0 1 10
-// 1 2 15
-// 2 3 20
-// 3 0 25
-// 0 2 30
+// Enter number of vertices and edges: 4 5
+// Enter edge 1 (u v weight): 0 1 10
+// Enter edge 2 (u v weight): 1 2 15
+// Enter edge 3 (u v weight): 2 3 20
+// Enter edge 4 (u v weight): 3 0 25
+// Enter edge 5 (u v weight): 0 2 30
+// Enter starting vertex: 0

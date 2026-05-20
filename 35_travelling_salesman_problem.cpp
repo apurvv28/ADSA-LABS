@@ -2,59 +2,88 @@
 #include <vector>
 using namespace std;
 
-int main()
+int tsp(int city,
+        int visited,
+        vector<vector<int>> &cost,
+        vector<vector<int>> &dp,
+        int n)
 {
-
-    int n;
-    cin >> n;
-    vector<vector<long long>> cost(n, vector<long long>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            cin >> cost[i][j];
-
-    const long long INF = (1LL << 60);
-    int N = 1 << n;
-    vector<vector<long long>> dp(N, vector<long long>(n, INF));
-    dp[1][0] = 0;
-
-    for (int mask = 1; mask < N; mask++)
+    if (visited == (1 << n) - 1)
     {
-        for (int u = 0; u < n; u++)
+        return cost[city][0];
+    }
+
+    if (dp[visited][city] != -1)
+    {
+        return dp[visited][city];
+    }
+
+    int answer = 999999;
+
+    for (int next = 0; next < n; next++)
+    {
+        if ((visited & (1 << next)) == 0)
         {
-            if (!(mask & (1 << u)))
-                continue;
-            long long cur = dp[mask][u];
-            if (cur == INF)
-                continue;
-            for (int v = 0; v < n; v++)
-            {
-                if (mask & (1 << v))
-                    continue;
-                dp[mask | (1 << v)][v] = min(dp[mask | (1 << v)][v], cur + cost[u][v]);
-            }
+            int newCost =
+                cost[city][next] + tsp(next,
+                                       visited | (1 << next),
+                                       cost,
+                                       dp,
+                                       n);
+
+            answer = min(answer,
+                         newCost);
         }
     }
 
-    long long ans = INF;
-    int full = N - 1;
-    for (int u = 0; u < n; u++)
-    {
-        if (dp[full][u] != INF)
-            ans = min(ans, dp[full][u] + cost[u][0]);
-    }
-    cout << ans << "\n";
-    return 0;
+    return dp[visited][city] = answer;
 }
 
+int main()
+{
+    int n;
+    cout << "Enter number of cities: ";
+    cin >> n;
+
+    vector<vector<int>> cost(
+        n,
+        vector<int>(n));
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            cout << "Enter cost from city " << i << " to " << j << ": ";
+            cin >> cost[i][j];
+        }
+    }
+
+    vector<vector<int>> dp(
+        1 << n,
+        vector<int>(n, -1));
+
+    cout << "Minimum Cost: ";
+    cout << tsp(0, 1, cost, dp, n);
+}
 
 // Time Complexity: O(N!) or O(N^2 * 2^N)
 // Space Complexity: O(N) or O(N * 2^N)
 
 // Example Input:
-// 4 6
-// 0 1 10
-// 1 2 15
-// 2 3 20
-// 3 0 25
-// 0 2 30
-// 1 3 35
+// Enter number of cities: 4
+// Enter cost from city 0 to 0: 0
+// Enter cost from city 0 to 1: 10
+// Enter cost from city 0 to 2: 15
+// Enter cost from city 0 to 3: 20
+// Enter cost from city 1 to 0: 10
+// Enter cost from city 1 to 1: 0
+// Enter cost from city 1 to 2: 35
+// Enter cost from city 1 to 3: 25
+// Enter cost from city 2 to 0: 15
+// Enter cost from city 2 to 1: 35
+// Enter cost from city 2 to 2: 0
+// Enter cost from city 2 to 3: 30
+// Enter cost from city 3 to 0: 20
+// Enter cost from city 3 to 1: 25
+// Enter cost from city 3 to 2: 30
+// Enter cost from city 3 to 3: 0

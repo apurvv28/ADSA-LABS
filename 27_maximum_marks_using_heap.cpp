@@ -2,42 +2,57 @@
 #include <vector>
 using namespace std;
 
-struct MaxHeap
+void insertHeap(vector<int>& heap, int value)
 {
-    vector<int> a;
-    MaxHeap() { a.push_back(0); }
-    void push(int x)
+    heap.push_back(value);
+
+    int index = heap.size() - 1;
+
+    while (index > 1 &&
+           heap[index] > heap[index / 2])
     {
-        a.push_back(x);
-        int i = (int)a.size() - 1;
-        while (i > 1 && a[i / 2] < a[i])
-        {
-            swap(a[i / 2], a[i]);
-            i /= 2;
-        }
+        swap(heap[index],
+             heap[index / 2]);
+
+        index = index / 2;
     }
-    int top() const { return a.size() > 1 ? a[1] : 0; }
-};
+}
+
+int getMaximum(vector<int>& heap)
+{
+    return heap[1];
+}
 
 int main()
 {
     int n;
+    cout << "Enter number of students: ";
     cin >> n;
-    MaxHeap h;
+
+    vector<int> heap;
+
+    heap.push_back(-1);
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        h.push(x);
-    }
-    cout << h.top() << "\n";
-    return 0;
-}
+        int value;
+        cout << "Enter marks of student " << (i+1) << ": ";
+        cin >> value;
 
+        insertHeap(heap, value);
+    }
+
+    cout << "Maximum = "
+         << getMaximum(heap);
+}
 
 // Time Complexity: O(N log N)
 // Space Complexity: O(N)
 
 // Example Input:
-// 5
-// 10 20 15 30 25
+// Enter number of students: 5
+// Enter marks of student 1: 10
+// Enter marks of student 2: 20
+// Enter marks of student 3: 15
+// Enter marks of student 4: 30
+// Enter marks of student 5: 25

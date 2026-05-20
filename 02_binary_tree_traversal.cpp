@@ -5,76 +5,93 @@ using namespace std;
 struct Node
 {
     int data;
-    Node *left;
-    Node *right;
-    Node(int v) : data(v), left(nullptr), right(nullptr) {}
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-void inorder(Node *r)
+void inorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    inorder(r->left);
-    cout << r->data << ' ';
-    inorder(r->right);
+
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
 }
-void preorder(Node *r)
+
+void preorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    cout << r->data << ' ';
-    preorder(r->left);
-    preorder(r->right);
+
+    cout << root->data << " ";
+    preorder(root->left);
+    preorder(root->right);
 }
-void postorder(Node *r)
+
+void postorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    postorder(r->left);
-    postorder(r->right);
-    cout << r->data << ' ';
+
+    postorder(root->left);
+    postorder(root->right);
+    cout << root->data << " ";
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    if (n <= 0)
-        return 0;
-    int x;
-    cin >> x;
-    Node *root = new Node(x);
-    queue<Node *> q;
+
+    int value;
+    cout << "Enter root value: ";
+    cin >> value;
+
+    Node* root = new Node(value);
+
+    queue<Node*> q;
     q.push(root);
-    int i = 1;
-    while (i < n)
+
+    int count = 1;
+
+    while (count < n)
     {
-        Node *cur = q.front();
+        Node* current = q.front();
         q.pop();
-        if (i < n)
+
+        cin >> value;
+        current->left = new Node(value);
+        q.push(current->left);
+        count++;
+
+        if (count < n)
         {
-            cin >> x;
-            cur->left = new Node(x);
-            q.push(cur->left);
-            i++;
-        }
-        if (i < n)
-        {
-            cin >> x;
-            cur->right = new Node(x);
-            q.push(cur->right);
-            i++;
+            cin >> value;
+            current->right = new Node(value);
+            q.push(current->right);
+            count++;
         }
     }
 
+    cout << "\nInorder: ";
     inorder(root);
-    cout << "\n";
+    cout << endl;
+
+    cout << "Preorder: ";
     preorder(root);
-    cout << "\n";
+    cout << endl;
+
+    cout << "Postorder: ";
     postorder(root);
-    cout << "\n";
-    return 0;
 }
 
 
@@ -82,5 +99,9 @@ int main()
 // Space Complexity: O(H) where H is height
 
 // Example Input:
-// 5
-// 1 2 3 4 5
+// Enter number of nodes: 5
+// Enter root value: 1
+// Enter left child: 2
+// Enter left child: 4
+// Enter right child: 5
+// Enter right child: 3

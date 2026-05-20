@@ -6,125 +6,146 @@ using namespace std;
 struct Node
 {
     bool leaf;
+
     vector<int> keys;
-    vector<Node *> child;
-    Node *next;
-    Node(bool isLeaf) : leaf(isLeaf), next(nullptr) {}
+    vector<Node*> child;
+
+    Node* next;
+
+    Node(bool isLeaf)
+    {
+        leaf = isLeaf;
+        next = NULL;
+    }
 };
 
-struct BPlusTree
+class BPlusTree
 {
-    int m;
-    Node *root;
-    BPlusTree(int order) : m(order), root(new Node(true)) {}
+    int order;
 
-    int maxKeys() const { return m - 1; }
-    int minKeysLeaf() const { return (maxKeys() + 1) / 2; }
-    int minKeysInternal() const { return (maxKeys()) / 2; }
+public:
+    Node* root;
 
-    Node *findLeaf(int key)
+    BPlusTree(int m)
     {
-        Node *cur = root;
-        while (!cur->leaf)
-        {
-            int i = 0;
-            while (i < (int)cur->keys.size() && key >= cur->keys[i])
-                i++;
-            cur = cur->child[i];
-        }
-        return cur;
+        order = m;
+
+        root = new Node(true);
     }
 
-    void insertInternal(int key, Node *left, Node *right, vector<Node *> &path)
+    int maxKeys()
     {
-        if (path.empty())
-        {
-            Node *nr = new Node(false);
-            nr->keys.push_back(key);
-            nr->child.push_back(left);
-            nr->child.push_back(right);
-            root = nr;
-            return;
-        }
-
-        Node *parent = path.back();
-        path.pop_back();
-
-        int pos = 0;
-        while (pos < (int)parent->child.size() && parent->child[pos] != left)
-            pos++;
-        parent->keys.insert(parent->keys.begin() + pos, key);
-        parent->child.insert(parent->child.begin() + pos + 1, right);
-
-        if ((int)parent->keys.size() <= maxKeys())
-            return;
-
-        int midIdx = (int)parent->keys.size() / 2;
-        int upKey = parent->keys[midIdx];
-
-        Node *newInternal = new Node(false);
-        newInternal->keys.assign(parent->keys.begin() + midIdx + 1, parent->keys.end());
-        newInternal->child.assign(parent->child.begin() + midIdx + 1, parent->child.end());
-
-        parent->keys.resize(midIdx);
-        parent->child.resize(midIdx + 1);
-
-        insertInternal(upKey, parent, newInternal, path);
+        return order - 1;
     }
 
     void insert(int key)
     {
-        vector<Node *> path;
-        Node *cur = root;
-        while (!cur->leaf)
+        Node* current = root;
+
+        vector<Node*> path;
+
+        while (!current->leaf)
         {
-            path.push_back(cur);
+            path.push_back(current);
+
             int i = 0;
-            while (i < (int)cur->keys.size() && key >= cur->keys[i])
+
+            while (i < current->keys.size() &&
+                   key >= current->keys[i])
+            {
                 i++;
-            cur = cur->child[i];
+            }
+
+            current = current->child[i];
         }
 
         int i = 0;
-        while (i < (int)cur->keys.size() && cur->keys[i] < key)
+
+        while (i < current->keys.size() &&
+               key > current->keys[i])
+        {
             i++;
-        cur->keys.insert(cur->keys.begin() + i, key);
+        }
 
-        if ((int)cur->keys.size() <= maxKeys())
+        current->keys.insert(current->keys.begin() + i, key);
+
+        if (current->keys.size() <= maxKeys())
+        {
             return;
+        }
 
-        int split = (int)cur->keys.size() / 2;
-        Node *newLeaf = new Node(true);
-        newLeaf->keys.assign(cur->keys.begin() + split, cur->keys.end());
-        cur->keys.resize(split);
+        int mid = current->keys.size() / 2;
 
-        newLeaf->next = cur->next;
-        cur->next = newLeaf;
+        Node* newLeaf = new Node(true);
+
+        for (int i = mid; i < current->keys.size(); i++)
+        {
+            newLeaf->keys.push_back(current->keys[i]);
+        }
+
+        current->keys.resize(mid);
+
+        newLeaf->next = current->next;
+
+        current->next = newLeaf;
 
         int promote = newLeaf->keys[0];
-        insertInternal(promote, cur, newLeaf, path);
+
+        if (path.empty())
+        {
+            Node* newRoot = new Node(false);
+
+            newRoot->keys.push_back(promote);
+
+            newRoot->child.push_back(current);
+            newRoot->child.push_back(newLeaf);
+
+            root = newRoot;
+
+            return;
+        }
+
+        Node* parent = path.back();
+
+        parent->keys.push_back(promote);
+
+        parent->child.push_back(newLeaf);
     }
 
-    void printLevels()
+    void levelOrder()
     {
-        queue<Node *> q;
+        queue<Node*> q;
+
         q.push(root);
+
         while (!q.empty())
         {
-            int sz = (int)q.size();
-            while (sz--)
+            int size = q.size();
+
+            while (size--)
             {
-                Node *n = q.front();
+                Node* current = q.front();
                 q.pop();
+
                 cout << "[";
-                for (int k : n->keys)
-                    cout << k << ' ';
+
+                for (int x : current->keys)
+                {
+                    cout << x << " ";
+                }
+
                 cout << "] ";
-                if (!n->leaf)
-                    for (auto *c : n->child)
+
+                if (!current->leaf)
+                {
+                    for (Node* c : current->child)
+                    {
                         q.push(c);
+                    }
+                }
             }
-            cout << "\n";
+
+            cout << endl;
         }
     }
 };
@@ -132,18 +153,23 @@ struct BPlusTree
 int main()
 {
     int order, n;
+
+    cout << "Enter order of B+ tree and number of elements: ";
     cin >> order >> n;
-    if (order < 3)
-        order = 3;
-    BPlusTree t(order);
+
+    BPlusTree tree(order);
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        t.insert(x);
+        int value;
+        cout << "Enter element " << (i+1) << ": ";
+        cin >> value;
+
+        tree.insert(value);
     }
-    t.printLevels();
-    return 0;
+
+    cout << "\nB+ Tree Structure (Level Order):" << endl;
+    tree.levelOrder();
 }
 
 
@@ -151,6 +177,9 @@ int main()
 // Space Complexity: O(N)
 
 // Example Input:
-// 3
-// 5
-// 10 20 5 6 12
+// Enter order of B+ tree and number of elements: 3 5
+// Enter element 1: 10
+// Enter element 2: 20
+// Enter element 3: 5
+// Enter element 4: 6
+// Enter element 5: 12

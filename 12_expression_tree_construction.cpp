@@ -1,90 +1,74 @@
 #include <iostream>
-#include <sstream>
 #include <stack>
-#include <string>
 using namespace std;
 
 struct Node
 {
-    string val;
-    Node *left;
-    Node *right;
-    Node(string v) : val(std::move(v)), left(nullptr), right(nullptr) {}
+    char data;
+    Node* left;
+    Node* right;
+
+    Node(char value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-bool isOp(const string &t)
+bool isOperator(char ch)
 {
-    return t.size() == 1 && (t[0] == '+' || t[0] == '-' || t[0] == '*' || t[0] == '/' || t[0] == '^');
+    return ch == '+' || ch == '-' || ch == '*' || ch == '/';
 }
 
-string inorder(Node *r)
+void inorder(Node* root)
 {
-    if (!r)
-        return "";
-    if (!isOp(r->val))
-        return r->val;
-    return "(" + inorder(r->left) + r->val + inorder(r->right) + ")";
+    if (root == NULL)
+        return;
+
+    inorder(root->left);
+
+    cout << root->data;
+
+    inorder(root->right);
 }
 
 int main()
 {
+    string exp;
+    cout << "Enter expression in postfix notation: ";
+    cin >> exp;
 
-    string line;
-    getline(cin, line);
-    if (line.empty())
-        getline(cin, line);
-    if (line.empty())
-        return 0;
+    stack<Node*> st;
 
-    stack<Node *> st;
-
-    if (line.find(' ') != string::npos)
+    for (char ch : exp)
     {
-        stringstream ss(line);
-        string t;
-        while (ss >> t)
+        if (!isOperator(ch))
         {
-            if (!isOp(t))
-                st.push(new Node(t));
-            else
-            {
-                Node *r = st.top();
-                st.pop();
-                Node *l = st.top();
-                st.pop();
-                Node *op = new Node(t);
-                op->left = l;
-                op->right = r;
-                st.push(op);
-            }
+            st.push(new Node(ch));
         }
-    }
-    else
-    {
-        for (char c : line)
+
+        else
         {
-            if (c == ' ' || c == '\t')
-                continue;
-            string t(1, c);
-            if (!isOp(t))
-                st.push(new Node(t));
-            else
-            {
-                Node *r = st.top();
-                st.pop();
-                Node *l = st.top();
-                st.pop();
-                Node *op = new Node(t);
-                op->left = l;
-                op->right = r;
-                st.push(op);
-            }
+            Node* right = st.top();
+            st.pop();
+
+            Node* left = st.top();
+            st.pop();
+
+            Node* op = new Node(ch);
+
+            op->left = left;
+            op->right = right;
+
+            st.push(op);
         }
     }
 
-    Node *root = st.empty() ? nullptr : st.top();
-    cout << inorder(root) << "\n";
-    return 0;
+    Node* root = st.top();
+
+    cout << "\nInorder (Infix Expression): ";
+    inorder(root);
 }
 
 
@@ -92,4 +76,4 @@ int main()
 // Space Complexity: O(N)
 
 // Example Input:
-// ab+c*
+// Enter expression in postfix notation: ab+c*

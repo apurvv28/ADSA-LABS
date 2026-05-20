@@ -5,57 +5,65 @@ using namespace std;
 struct Node
 {
     int data;
-    Node *left;
-    Node *right;
-    Node(int v) : data(v), left(nullptr), right(nullptr) {}
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-int height(Node *r)
+int height(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return 0;
-    int hl = height(r->left);
-    int hr = height(r->right);
-    return 1 + (hl > hr ? hl : hr);
+
+    int leftHeight = height(root->left);
+    int rightHeight = height(root->right);
+
+    return max(leftHeight, rightHeight) + 1;
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    if (n <= 0)
-    {
-        cout << 0 << "\n";
-        return 0;
-    }
-    int x;
-    cin >> x;
-    Node *root = new Node(x);
-    queue<Node *> q;
+
+    int value;
+    cout << "Enter root value: ";
+    cin >> value;
+
+    Node* root = new Node(value);
+
+    queue<Node*> q;
     q.push(root);
-    int i = 1;
-    while (i < n)
+
+    int count = 1;
+
+    while (count < n)
     {
-        Node *cur = q.front();
+        Node* current = q.front();
         q.pop();
-        if (i < n)
+
+        cin >> value;
+        current->left = new Node(value);
+        q.push(current->left);
+        count++;
+
+        if (count < n)
         {
-            cin >> x;
-            cur->left = new Node(x);
-            q.push(cur->left);
-            i++;
-        }
-        if (i < n)
-        {
-            cin >> x;
-            cur->right = new Node(x);
-            q.push(cur->right);
-            i++;
+            cin >> value;
+            current->right = new Node(value);
+            q.push(current->right);
+            count++;
         }
     }
-    cout << height(root) << "\n";
-    return 0;
+
+    cout << "\nHeight of Tree: " << height(root);
 }
 
 
@@ -63,5 +71,9 @@ int main()
 // Space Complexity: O(H)
 
 // Example Input:
-// 5
-// 1 2 3 4 5
+// Enter number of nodes: 5
+// Enter root value: 1
+// Enter left child: 2
+// Enter left child: 4
+// Enter right child: 5
+// Enter right child: 3

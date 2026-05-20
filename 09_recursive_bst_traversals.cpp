@@ -3,67 +3,88 @@ using namespace std;
 
 struct Node
 {
-    int key;
-    Node *left;
-    Node *right;
-    Node(int v) : key(v), left(nullptr), right(nullptr) {}
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-Node *insertNode(Node *r, int x)
+Node* insert(Node* root, int value)
 {
-    if (!r)
-        return new Node(x);
-    if (x < r->key)
-        r->left = insertNode(r->left, x);
-    else if (x > r->key)
-        r->right = insertNode(r->right, x);
-    return r;
+    if (root == NULL)
+        return new Node(value);
+
+    if (value < root->data)
+        root->left = insert(root->left, value);
+
+    else if (value > root->data)
+        root->right = insert(root->right, value);
+
+    return root;
 }
 
-void inorder(Node *r)
+void inorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    inorder(r->left);
-    cout << r->key << ' ';
-    inorder(r->right);
+
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
 }
-void preorder(Node *r)
+
+void preorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    cout << r->key << ' ';
-    preorder(r->left);
-    preorder(r->right);
+
+    cout << root->data << " ";
+    preorder(root->left);
+    preorder(root->right);
 }
-void postorder(Node *r)
+
+void postorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    postorder(r->left);
-    postorder(r->right);
-    cout << r->key << ' ';
+
+    postorder(root->left);
+    postorder(root->right);
+    cout << root->data << " ";
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    Node *root = nullptr;
+
+    Node* root = NULL;
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        root = insertNode(root, x);
+        int value;
+        cout << "Enter node " << (i+1) << ": ";
+        cin >> value;
+
+        root = insert(root, value);
     }
+
     inorder(root);
-    cout << "\n";
+    cout << endl;
+
+    cout << "Preorder: ";
     preorder(root);
-    cout << "\n";
+    cout << endl;
+
+    cout << "Postorder: ";
     postorder(root);
-    cout << "\n";
-    return 0;
 }
 
 
@@ -71,5 +92,9 @@ int main()
 // Space Complexity: O(H)
 
 // Example Input:
-// 5
-// 5 3 7 1 9
+// Enter number of nodes: 5
+// Enter node 1: 5
+// Enter node 2: 3
+// Enter node 3: 7
+// Enter node 4: 1
+// Enter node 5: 9

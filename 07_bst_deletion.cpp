@@ -3,86 +3,114 @@ using namespace std;
 
 struct Node
 {
-    int key;
-    Node *left;
-    Node *right;
-    Node(int v) : key(v), left(nullptr), right(nullptr) {}
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-Node *insertNode(Node *r, int x)
+Node* insert(Node* root, int value)
 {
-    if (!r)
-        return new Node(x);
-    if (x < r->key)
-        r->left = insertNode(r->left, x);
-    else if (x > r->key)
-        r->right = insertNode(r->right, x);
-    return r;
+    if (root == NULL)
+        return new Node(value);
+
+    if (value < root->data)
+        root->left = insert(root->left, value);
+
+    else if (value > root->data)
+        root->right = insert(root->right, value);
+
+    return root;
 }
 
-Node *minNode(Node *r)
+Node* minValue(Node* root)
 {
-    while (r && r->left)
-        r = r->left;
-    return r;
+    while (root->left != NULL)
+    {
+        root = root->left;
+    }
+
+    return root;
 }
 
-Node *deleteNode(Node *r, int k)
+Node* deleteNode(Node* root, int key)
 {
-    if (!r)
-        return nullptr;
-    if (k < r->key)
-        r->left = deleteNode(r->left, k);
-    else if (k > r->key)
-        r->right = deleteNode(r->right, k);
+    if (root == NULL)
+        return NULL;
+
+    if (key < root->data)
+    {
+        root->left = deleteNode(root->left, key);
+    }
+
+    else if (key > root->data)
+    {
+        root->right = deleteNode(root->right, key);
+    }
+
     else
     {
-        if (!r->left)
+        if (root->left == NULL)
         {
-            Node *t = r->right;
-            delete r;
-            return t;
+            return root->right;
         }
-        if (!r->right)
+
+        else if (root->right == NULL)
         {
-            Node *t = r->left;
-            delete r;
-            return t;
+            return root->left;
         }
-        Node *s = minNode(r->right);
-        r->key = s->key;
-        r->right = deleteNode(r->right, s->key);
+
+        Node* temp = minValue(root->right);
+
+        root->data = temp->data;
+
+        root->right = deleteNode(root->right, temp->data);
     }
-    return r;
+
+    return root;
 }
 
-void inorder(Node *r)
+void inorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    inorder(r->left);
-    cout << r->key << ' ';
-    inorder(r->right);
+
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    Node *root = nullptr;
+
+    Node* root = NULL;
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        root = insertNode(root, x);
+        int value;
+        cout << "Enter node " << (i+1) << ": ";
+        cin >> value;
+
+        root = insert(root, value);
     }
+
     int key;
+    cout << "Enter key to delete: ";
     cin >> key;
+
     root = deleteNode(root, key);
+
+    cout << "\nInorder Traversal after deletion: ";
     inorder(root);
-    cout << "\n";
-    return 0;
 }
 
 
@@ -90,6 +118,10 @@ int main()
 // Space Complexity: O(H)
 
 // Example Input:
-// 5
-// 5 3 7 1 9
-// 3
+// Enter number of nodes: 5
+// Enter node 1: 5
+// Enter node 2: 3
+// Enter node 3: 7
+// Enter node 4: 1
+// Enter node 5: 9
+// Enter key to delete: 3

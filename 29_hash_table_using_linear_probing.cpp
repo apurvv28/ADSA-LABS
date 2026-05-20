@@ -1,66 +1,95 @@
 #include <iostream>
 #include <vector>
-#include <string>
 using namespace std;
 
-struct Entry
+struct Data
 {
-    long long phone = -1;
+    long long phone;
     string name;
-    bool used = false;
 };
+
+void insert(vector<Data>& table,
+            int size,
+            string name,
+            long long phone)
+{
+    int index = phone % size;
+
+    while (table[index].phone != -1)
+    {
+        index = (index + 1) % size;
+    }
+
+    table[index].phone = phone;
+
+    table[index].name = name;
+}
+
+void search(vector<Data>& table,
+            int size,
+            long long phone)
+{
+    int index = phone % size;
+
+    int start = index;
+
+    while (table[index].phone != -1)
+    {
+        if (table[index].phone == phone)
+        {
+            cout << table[index].name
+                 << endl;
+
+            return;
+        }
+
+        index = (index + 1) % size;
+
+        if (index == start)
+        {
+            break;
+        }
+    }
+
+    cout << "NOT FOUND" << endl;
+}
 
 int main()
 {
-    int m, n;
-    cin >> m >> n;
-    if (m <= 0)
-        return 0;
-    vector<Entry> t(m);
+    int size, n;
+    cout << "Enter table size and number of entries: ";
+    cin >> size >> n;
+
+    vector<Data> table(size);
+
+    for (int i = 0; i < size; i++)
+    {
+        table[i].phone = -1;
+    }
 
     for (int i = 0; i < n; i++)
     {
         string name;
         long long phone;
+
+        cout << "Enter name and phone of entry " << (i+1) << ": ";
         cin >> name >> phone;
-        int idx = (int)((phone % m + m) % m);
-        int start = idx;
-        while (t[idx].used && t[idx].phone != phone)
-        {
-            idx = (idx + 1) % m;
-            if (idx == start)
-                break;
-        }
-        t[idx].used = true;
-        t[idx].phone = phone;
-        t[idx].name = name;
+
+        insert(table, size, name, phone);
     }
 
-    long long q;
-    while (cin >> q)
+    long long phone;
+
+    cout << "\nEnter phone numbers to search (enter -1 to exit):\n";
+    while (cin >> phone)
     {
-        if (q == -1)
-            break;
-        int idx = (int)((q % m + m) % m);
-        int start = idx;
-        bool ok = false;
-        while (t[idx].used)
+        if (phone == -1)
         {
-            if (t[idx].phone == q)
-            {
-                ok = true;
-                break;
-            }
-            idx = (idx + 1) % m;
-            if (idx == start)
-                break;
+            break;
         }
-        if (ok)
-            cout << t[idx].name << "\n";
-        else
-            cout << "NOT FOUND\n";
+
+        search(table, size, phone);
     }
-    return 0;
 }
 
 
@@ -68,5 +97,10 @@ int main()
 // Space Complexity: O(N)
 
 // Example Input:
-// 5
-// 10 20 15 30 25
+// Enter table size and number of entries: 5 3
+// Enter name and phone of entry 1: Alice 1234567890
+// Enter name and phone of entry 2: Bob 9876543210
+// Enter name and phone of entry 3: Charlie 5555555555
+// Enter phone numbers to search (enter -1 to exit):
+// 1234567890
+// -1

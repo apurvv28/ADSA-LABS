@@ -3,93 +3,150 @@ using namespace std;
 
 struct Node
 {
-    int key;
-    int h;
-    Node *left;
-    Node *right;
-    Node(int v) : key(v), h(1), left(nullptr), right(nullptr) {}
+    int data;
+    int height;
+
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        height = 1;
+
+        left = NULL;
+        right = NULL;
+    }
 };
 
-int height(Node *n) { return n ? n->h : 0; }
-int bal(Node *n) { return n ? height(n->left) - height(n->right) : 0; }
-int mx(int a, int b) { return a > b ? a : b; }
-
-Node *rightRotate(Node *y)
+int getHeight(Node* root)
 {
-    Node *x = y->left;
-    Node *t2 = x->right;
+    if (root == NULL)
+        return 0;
+
+    return root->height;
+}
+
+int getBalance(Node* root)
+{
+    if (root == NULL)
+        return 0;
+
+    return getHeight(root->left) - getHeight(root->right);
+}
+
+int maxValue(int a, int b)
+{
+    if (a > b)
+        return a;
+
+    return b;
+}
+
+Node* rightRotate(Node* y)
+{
+    Node* x = y->left;
+    Node* t = x->right;
+
     x->right = y;
-    y->left = t2;
-    y->h = 1 + mx(height(y->left), height(y->right));
-    x->h = 1 + mx(height(x->left), height(x->right));
+    y->left = t;
+
+    y->height = maxValue(getHeight(y->left), getHeight(y->right)) + 1;
+
+    x->height = maxValue(getHeight(x->left), getHeight(x->right)) + 1;
+
     return x;
 }
 
-Node *leftRotate(Node *x)
+Node* leftRotate(Node* x)
 {
-    Node *y = x->right;
-    Node *t2 = y->left;
+    Node* y = x->right;
+    Node* t = y->left;
+
     y->left = x;
-    x->right = t2;
-    x->h = 1 + mx(height(x->left), height(x->right));
-    y->h = 1 + mx(height(y->left), height(y->right));
+    x->right = t;
+
+    x->height = maxValue(getHeight(x->left), getHeight(x->right)) + 1;
+
+    y->height = maxValue(getHeight(y->left), getHeight(y->right)) + 1;
+
     return y;
 }
 
-Node *insertNode(Node *node, int key)
+Node* insert(Node* root, int value)
 {
-    if (!node)
-        return new Node(key);
-    if (key < node->key)
-        node->left = insertNode(node->left, key);
-    else if (key > node->key)
-        node->right = insertNode(node->right, key);
-    else
-        return node;
+    if (root == NULL)
+        return new Node(value);
 
-    node->h = 1 + mx(height(node->left), height(node->right));
-    int b = bal(node);
+    if (value < root->data)
+    {
+        root->left = insert(root->left, value);
+    }
 
-    if (b > 1 && key < node->left->key)
-        return rightRotate(node);
-    if (b < -1 && key > node->right->key)
-        return leftRotate(node);
-    if (b > 1 && key > node->left->key)
+    else if (value > root->data)
     {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
+        root->right = insert(root->right, value);
     }
-    if (b < -1 && key < node->right->key)
+
+    root->height =
+        maxValue(getHeight(root->left), getHeight(root->right)) + 1;
+
+    int balance = getBalance(root);
+
+    if (balance > 1 && value < root->left->data)
     {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
+        return rightRotate(root);
     }
-    return node;
+
+    if (balance < -1 && value > root->right->data)
+    {
+        return leftRotate(root);
+    }
+
+    if (balance > 1 && value > root->left->data)
+    {
+        root->left = leftRotate(root->left);
+
+        return rightRotate(root);
+    }
+
+    if (balance < -1 && value < root->right->data)
+    {
+        root->right = rightRotate(root->right);
+
+        return leftRotate(root);
+    }
+
+    return root;
 }
 
-void inorder(Node *r)
+void inorder(Node* root)
 {
-    if (!r)
+    if (root == NULL)
         return;
-    inorder(r->left);
-    cout << r->key << ' ';
-    inorder(r->right);
+
+    inorder(root->left);
+    cout << root->data << " ";
+    inorder(root->right);
 }
 
 int main()
 {
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    Node *root = nullptr;
+
+    Node* root = NULL;
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        root = insertNode(root, x);
+        int value;
+        cin >> value;
+
+        root = insert(root, value);
     }
+
     inorder(root);
-    cout << "\n";
-    return 0;
 }
 
 
@@ -97,5 +154,9 @@ int main()
 // Space Complexity: O(log N)
 
 // Example Input:
-// 5
-// 1 2 3 4 5
+// Enter number of nodes: 5
+// Enter node 1: 1
+// Enter node 2: 2
+// Enter node 3: 3
+// Enter node 4: 4
+// Enter node 5: 5

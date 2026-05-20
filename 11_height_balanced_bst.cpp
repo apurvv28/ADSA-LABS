@@ -3,61 +3,112 @@ using namespace std;
 
 struct Node
 {
-    int key;
+    int data;
     Node *left;
     Node *right;
-    Node(int v) : key(v), left(nullptr), right(nullptr) {}
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-Node *insertNode(Node *r, int x)
+Node *insert(Node *root, int value)
 {
-    if (!r)
-        return new Node(x);
-    if (x < r->key)
-        r->left = insertNode(r->left, x);
-    else if (x > r->key)
-        r->right = insertNode(r->right, x);
-    return r;
+    if (root == NULL)
+    {
+        return new Node(value);
+    }
+
+    if (value < root->data)
+    {
+        root->left = insert(root->left, value);
+    }
+
+    else if (value > root->data)
+    {
+        root->right = insert(root->right, value);
+    }
+
+    return root;
 }
 
-int check(Node *r)
+int checkBalance(Node *root)
 {
-    if (!r)
+    if (root == NULL)
+    {
         return 0;
-    int hl = check(r->left);
-    if (hl == -1)
+    }
+
+    int leftHeight = checkBalance(root->left);
+
+    if (leftHeight == -1)
+    {
         return -1;
-    int hr = check(r->right);
-    if (hr == -1)
+    }
+
+    int rightHeight = checkBalance(root->right);
+
+    if (rightHeight == -1)
+    {
         return -1;
-    int diff = hl - hr;
+    }
+
+    int diff = leftHeight - rightHeight;
+
     if (diff < 0)
+    {
         diff = -diff;
+    }
+
     if (diff > 1)
+    {
         return -1;
-    return 1 + (hl > hr ? hl : hr);
+    }
+
+    if (leftHeight > rightHeight)
+    {
+        return leftHeight + 1;
+    }
+
+    return rightHeight + 1;
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    Node *root = nullptr;
+
+    Node *root = NULL;
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        root = insertNode(root, x);
+        int value;
+        cout << "Enter node " << (i+1) << ": ";
+        cin >> value;
+        root = insert(root, value);
     }
-    cout << (check(root) == -1 ? "NOT BALANCED\n" : "BALANCED\n");
-    return 0;
+    cout << "\nResult: ";
+    if (checkBalance(root) == -1)
+    {
+        cout << "NOT BALANCED";
+    }
+    else
+    {
+        cout << "BALANCED";
+    }
 }
-
 
 // Time Complexity: O(N log N) or O(N)
 // Space Complexity: O(H)
 
 // Example Input:
-// 5
-// 1 2 3 4 5
+// Enter number of nodes: 5
+// Enter node 1: 1
+// Enter node 2: 2
+// Enter node 3: 3
+// Enter node 4: 4
+// Enter node 5: 5

@@ -2,53 +2,88 @@
 #include <vector>
 using namespace std;
 
-int main()
+void floydWarshall(vector<vector<int>> &graph,
+                   int vertices)
 {
-    int V;
-    cin >> V;
-    const long long INF = (1LL << 60);
-    vector<vector<long long>> d(V, vector<long long>(V, INF));
-    for (int i = 0; i < V; i++)
+    for (int k = 0; k < vertices; k++)
     {
-        for (int j = 0; j < V; j++)
+        for (int i = 0; i < vertices; i++)
         {
-            long long x;
-            cin >> x;
-            if (i == j)
-                d[i][j] = 0;
-            if (x != -1)
-                d[i][j] = x;
+            for (int j = 0; j < vertices; j++)
+            {
+                if (graph[i][k] + graph[k][j] < graph[i][j])
+                {
+                    graph[i][j] =
+                        graph[i][k] + graph[k][j];
+                }
+            }
         }
     }
 
-    for (int k = 0; k < V; k++)
-        for (int i = 0; i < V; i++)
-            for (int j = 0; j < V; j++)
-                if (d[i][k] != INF && d[k][j] != INF && d[i][k] + d[k][j] < d[i][j])
-                    d[i][j] = d[i][k] + d[k][j];
-
-    for (int i = 0; i < V; i++)
+    for (int i = 0; i < vertices; i++)
     {
-        for (int j = 0; j < V; j++)
+        for (int j = 0; j < vertices; j++)
         {
-            if (d[i][j] == INF)
-                cout << -1;
+            if (graph[i][j] == 999999)
+            {
+                cout << "INF ";
+            }
+
             else
-                cout << d[i][j];
-            cout << (j + 1 == V ? '\n' : ' ');
+            {
+                cout << graph[i][j] << " ";
+            }
         }
+
+        cout << endl;
     }
-    return 0;
 }
 
+int main()
+{
+    int vertices;
+    cout << "Enter number of vertices: ";
+    cin >> vertices;
+
+    vector<vector<int>> graph(
+        vertices,
+        vector<int>(vertices));
+
+    for (int i = 0; i < vertices; i++)
+    {
+        for (int j = 0; j < vertices; j++)
+        {
+            cout << "Enter distance from " << i << " to " << j << ": ";
+            cin >> graph[i][j];
+
+            if (graph[i][j] == -1)
+            {
+                graph[i][j] = 999999;
+            }
+        }
+    }
+
+    floydWarshall(graph, vertices);
+}
 
 // Time Complexity: O(V^3)
 // Space Complexity: O(V^2)
 
 // Example Input:
-// 4 5
-// 0 1 10
-// 1 2 15
-// 2 3 20
-// 3 0 25
-// 0 2 30
+// Enter number of vertices: 4
+// Enter distance from 0 to 0: 0
+// Enter distance from 0 to 1: 10
+// Enter distance from 0 to 2: 999999
+// Enter distance from 0 to 3: 999999
+// Enter distance from 1 to 0: 999999
+// Enter distance from 1 to 1: 0
+// Enter distance from 1 to 2: 5
+// Enter distance from 1 to 3: 999999
+// Enter distance from 2 to 0: 999999
+// Enter distance from 2 to 1: 999999
+// Enter distance from 2 to 2: 0
+// Enter distance from 2 to 3: 8
+// Enter distance from 3 to 0: 999999
+// Enter distance from 3 to 1: 999999
+// Enter distance from 3 to 2: 999999
+// Enter distance from 3 to 3: 0

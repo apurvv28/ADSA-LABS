@@ -2,48 +2,88 @@
 #include <vector>
 using namespace std;
 
-struct Rec
+void merge(vector<int>& arr,
+           int left,
+           int mid,
+           int right)
 {
-    int roll;
-    int credit;
-};
+    vector<int> temp;
 
-void mergeSort(vector<Rec> &a, int l, int r, vector<Rec> &tmp)
-{
-    if (l >= r)
-        return;
-    int m = (l + r) / 2;
-    mergeSort(a, l, m, tmp);
-    mergeSort(a, m + 1, r, tmp);
-    int i = l, j = m + 1, k = l;
-    while (i <= m && j <= r)
+    int i = left;
+    int j = mid + 1;
+
+    while (i <= mid && j <= right)
     {
-        if (a[i].credit <= a[j].credit)
-            tmp[k++] = a[i++];
+        if (arr[i] < arr[j])
+        {
+            temp.push_back(arr[i]);
+            i++;
+        }
+
         else
-            tmp[k++] = a[j++];
+        {
+            temp.push_back(arr[j]);
+            j++;
+        }
     }
-    while (i <= m)
-        tmp[k++] = a[i++];
-    while (j <= r)
-        tmp[k++] = a[j++];
-    for (int p = l; p <= r; p++)
-        a[p] = tmp[p];
+
+    while (i <= mid)
+    {
+        temp.push_back(arr[i]);
+        i++;
+    }
+
+    while (j <= right)
+    {
+        temp.push_back(arr[j]);
+        j++;
+    }
+
+    for (int i = left; i <= right; i++)
+    {
+        arr[i] = temp[i - left];
+    }
+}
+
+void mergeSort(vector<int>& arr,
+               int left,
+               int right)
+{
+    if (left >= right)
+    {
+        return;
+    }
+
+    int mid = (left + right) / 2;
+
+    mergeSort(arr, left, mid);
+
+    mergeSort(arr, mid + 1, right);
+
+    merge(arr, left, mid, right);
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of elements: ";
     cin >> n;
-    vector<Rec> a(n), tmp(n);
+
+    vector<int> arr(n);
+
     for (int i = 0; i < n; i++)
-        cin >> a[i].roll >> a[i].credit;
-    if (n > 0)
-        mergeSort(a, 0, n - 1, tmp);
-    for (int i = 0; i < n; i++)
-        cout << a[i].roll << " " << a[i].credit << "\n";
-    return 0;
+    {
+        cout << "Enter element " << (i+1) << ": ";
+        cin >> arr[i];
+    }
+
+    mergeSort(arr, 0, n - 1);
+
+    cout << "\nSorted Array: ";
+    for (int x : arr)
+    {
+        cout << x << " ";
+    }
 }
 
 
@@ -51,5 +91,9 @@ int main()
 // Space Complexity: O(N)
 
 // Example Input:
-// 5
-// 5 4 3 2 1
+// Enter number of elements: 5
+// Enter element 1: 5
+// Enter element 2: 4
+// Enter element 3: 3
+// Enter element 4: 2
+// Enter element 5: 1

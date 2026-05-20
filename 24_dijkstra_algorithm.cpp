@@ -5,74 +5,95 @@ using namespace std;
 
 struct Edge
 {
-    int to;
-    int w;
+    int node;
+    int weight;
 };
 
-int main()
+void dijkstra(int vertices,
+              vector<vector<Edge>> &graph,
+              int start)
 {
-    int V, E;
-    cin >> V >> E;
-    vector<vector<Edge>> g(V);
-    for (int i = 0; i < E; i++)
-    {
-        int u, v, w;
-        cin >> u >> v >> w;
-        if (u >= 0 && u < V && v >= 0 && v < V)
-        {
-            g[u].push_back({v, w});
-            g[v].push_back({u, w});
-        }
-    }
-    int s;
-    cin >> s;
-    if (s < 0 || s >= V)
-        s = 0;
+    vector<int> distance(vertices, 999999);
 
-    const long long INF = (1LL << 60);
-    vector<long long> dist(V, INF);
-    dist[s] = 0;
-    priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
-    pq.push({0, s});
+    priority_queue<
+        pair<int, int>,
+        vector<pair<int, int>>,
+        greater<pair<int, int>>>
+        pq;
+
+    distance[start] = 0;
+
+    pq.push({0, start});
 
     while (!pq.empty())
     {
-        pair<long long, int> top = pq.top();
+        int currentDistance = pq.top().first;
+
+        int currentNode = pq.top().second;
+
         pq.pop();
-        long long d = top.first;
-        int u = top.second;
-        if (d != dist[u])
-            continue;
-        for (auto e : g[u])
+
+        if (currentDistance > distance[currentNode])
         {
-            if (dist[u] + e.w < dist[e.to])
+            continue;
+        }
+
+        for (Edge e : graph[currentNode])
+        {
+            if (distance[currentNode] + e.weight < distance[e.node])
             {
-                dist[e.to] = dist[u] + e.w;
-                pq.push(make_pair(dist[e.to], e.to));
+                distance[e.node] =
+                    distance[currentNode] + e.weight;
+
+                pq.push(
+                    {distance[e.node], e.node});
             }
         }
     }
 
-    for (int i = 0; i < V; i++)
+    for (int i = 0; i < vertices; i++)
     {
-        if (dist[i] == INF)
-            cout << "INF";
-        else
-            cout << dist[i];
-        cout << (i + 1 == V ? '\n' : ' ');
+        cout << "Distance of "
+             << i
+             << " = "
+             << distance[i]
+             << endl;
     }
-    return 0;
 }
 
+int main()
+{
+    int vertices, edges;
+    cout << "Enter number of vertices and edges: ";
+    cin >> vertices >> edges;
+
+    vector<vector<Edge>> graph(vertices);
+
+    for (int i = 0; i < edges; i++)
+    {
+        int u, v, w;
+        cout << "Enter edge " << (i+1) << " (u v weight): ";
+        cin >> u >> v >> w;
+
+        graph[u].push_back({v, w});
+        graph[v].push_back({u, w});
+    }
+
+    int start;
+    cout << "Enter starting vertex: ";
+    cin >> start;
+
+    dijkstra(vertices, graph, start);
+}
 
 // Time Complexity: O(E log V)
 // Space Complexity: O(V)
 
 // Example Input:
-// 4 5
-// 0 1 10
-// 1 2 15
-// 2 3 20
-// 3 0 25
-// 0 2 30
-// 0
+// Enter number of vertices and edges: 4 5
+// Enter edge 1 (u v weight): 0 1 10
+// Enter edge 2 (u v weight): 1 2 15
+// Enter edge 3 (u v weight): 2 3 20
+// Enter edge 4 (u v weight): 3 0 25
+// Enter edge 5 (u v weight): 0 2 30
+// Enter starting vertex: 0

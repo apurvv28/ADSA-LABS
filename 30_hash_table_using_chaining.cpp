@@ -1,44 +1,69 @@
 #include <iostream>
 #include <vector>
 #include <list>
-#include <string>
 using namespace std;
+
+void insert(vector<list<pair<long long, string>>>& table,
+            int size,
+            string name,
+            long long phone)
+{
+    int index = phone % size;
+
+    table[index].push_back({phone, name});
+}
+
+void search(vector<list<pair<long long, string>>>& table,
+            int size,
+            long long phone)
+{
+    int index = phone % size;
+
+    for (auto data : table[index])
+    {
+        if (data.first == phone)
+        {
+            cout << data.second
+                 << endl;
+
+            return;
+        }
+    }
+
+    cout << "NOT FOUND" << endl;
+}
 
 int main()
 {
-    int m, n;
-    cin >> m >> n;
-    if (m <= 0)
-        return 0;
-    vector<list<pair<long long, string>>> table(m);
+    int size, n;
+    cout << "Enter table size and number of entries: ";
+    cin >> size >> n;
+
+    vector<list<pair<long long, string>>> table(size);
 
     for (int i = 0; i < n; i++)
     {
         string name;
         long long phone;
+
+        cout << "Enter name and phone of entry " << (i+1) << ": ";
         cin >> name >> phone;
-        int idx = (int)((phone % m + m) % m);
-        table[idx].push_back({phone, name});
+
+        insert(table, size, name, phone);
     }
 
-    long long q;
-    while (cin >> q)
+    long long phone;
+
+    cout << "\nEnter phone numbers to search (enter -1 to exit):\n";
+    while (cin >> phone)
     {
-        if (q == -1)
+        if (phone == -1)
+        {
             break;
-        int idx = (int)((q % m + m) % m);
-        bool ok = false;
-        for (auto &p : table[idx])
-            if (p.first == q)
-            {
-                cout << p.second << "\n";
-                ok = true;
-                break;
-            }
-        if (!ok)
-            cout << "NOT FOUND\n";
+        }
+
+        search(table, size, phone);
     }
-    return 0;
 }
 
 
@@ -46,5 +71,10 @@ int main()
 // Space Complexity: O(N)
 
 // Example Input:
-// 5
-// 10 20 15 30 25
+// Enter table size and number of entries: 5 3
+// Enter name and phone of entry 1: Alice 1234567890
+// Enter name and phone of entry 2: Bob 9876543210
+// Enter name and phone of entry 3: Charlie 5555555555
+// Enter phone numbers to search (enter -1 to exit):
+// 1234567890
+// -1

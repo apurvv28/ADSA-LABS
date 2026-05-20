@@ -2,41 +2,106 @@
 #include <vector>
 using namespace std;
 
-bool solve(int row, int n, vector<int> &queensInRow, vector<int> &colOccupied, vector<int> &mainDiagOccupied, vector<int> &antiDiagOccupied)
+bool isSafe(vector<string>& board,
+            int row,
+            int col,
+            int n)
+{
+    for (int i = 0; i < row; i++)
+    {
+        if (board[i][col] == 'Q')
+        {
+            return false;
+        }
+    }
+
+    int i = row;
+    int j = col;
+
+    while (i >= 0 && j >= 0)
+    {
+        if (board[i][j] == 'Q')
+        {
+            return false;
+        }
+
+        i--;
+        j--;
+    }
+
+    i = row;
+    j = col;
+
+    while (i >= 0 && j < n)
+    {
+        if (board[i][j] == 'Q')
+        {
+            return false;
+        }
+
+        i--;
+        j++;
+    }
+
+    return true;
+}
+
+bool solve(vector<string>& board,
+           int row,
+           int n)
 {
     if (row == n)
+    {
         return true;
+    }
+
     for (int col = 0; col < n; col++)
     {
-        if (colOccupied[col] || mainDiagOccupied[row - col + n - 1] || antiDiagOccupied[row + col])
-            continue;
-        queensInRow[row] = col;
-        colOccupied[col] = mainDiagOccupied[row - col + n - 1] = antiDiagOccupied[row + col] = 1;
-        if (solve(row + 1, n, queensInRow, colOccupied, mainDiagOccupied, antiDiagOccupied))
-            return true;
-        colOccupied[col] = mainDiagOccupied[row - col + n - 1] = antiDiagOccupied[row + col] = 0;
+        if (isSafe(board,
+                   row,
+                   col,
+                   n))
+        {
+            board[row][col] = 'Q';
+
+            if (solve(board,
+                      row + 1,
+                      n))
+            {
+                return true;
+            }
+
+            board[row][col] = '.';
+        }
     }
+
     return false;
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter board size (N): ";
     cin >> n;
-    vector<int> queensInRow(n, -1), colOccupied(n, 0), mainDiagOccupied(2 * n - 1, 0), antiDiagOccupied(2 * n - 1, 0);
-    if (!solve(0, n, queensInRow, colOccupied, mainDiagOccupied, antiDiagOccupied))
+
+    vector<string> board(
+        n,
+        string(n, '.'));
+
+    cout << "\nN-Queens Solution:" << endl;
+    if (solve(board, 0, n))
     {
-        cout << "NO SOLUTION\n";
-        return 0;
+        for (int i = 0; i < n; i++)
+        {
+            cout << board[i]
+                 << endl;
+        }
     }
-    for (int row = 0; row < n; row++)
+
+    else
     {
-        for (int col = 0; col < n; col++)
-            cout << (queensInRow[row] == col ? 'Q' : '.');
-        cout << "\n";
+        cout << "No Solution";
     }
-    return 0;
 }
 
 
@@ -44,4 +109,4 @@ int main()
 // Space Complexity: O(N)
 
 // Example Input:
-// 4
+// Enter board size (N): 4

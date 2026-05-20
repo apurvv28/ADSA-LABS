@@ -4,56 +4,73 @@ using namespace std;
 
 struct Node
 {
-    int key;
-    Node *left;
-    Node *right;
-    Node(int v) : key(v), left(nullptr), right(nullptr) {}
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value)
+    {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
 };
 
-Node *insertNode(Node *r, int x)
+Node* insert(Node* root, int value)
 {
-    if (!r)
-        return new Node(x);
-    if (x < r->key)
-        r->left = insertNode(r->left, x);
-    else if (x > r->key)
-        r->right = insertNode(r->right, x);
-    return r;
+    if (root == NULL)
+        return new Node(value);
+
+    if (value < root->data)
+        root->left = insert(root->left, value);
+
+    else if (value > root->data)
+        root->right = insert(root->right, value);
+
+    return root;
 }
 
 int main()
 {
-
     int n;
+    cout << "Enter number of nodes: ";
     cin >> n;
-    Node *root = nullptr;
+
+    Node* root = NULL;
+
     for (int i = 0; i < n; i++)
     {
-        int x;
-        cin >> x;
-        root = insertNode(root, x);
-    }
-    if (!root)
-        return 0;
+        int value;
+        cout << "Enter node " << (i+1) << ": ";
+        cin >> value;
 
-    queue<Node *> q;
+        root = insert(root, value);
+    }
+
+    queue<Node*> q;
     q.push(root);
+
+    cout << "\nLevel Order Traversal:" << endl;
     while (!q.empty())
     {
-        int sz = (int)q.size();
-        while (sz--)
+        int size = q.size();
+
+        while (size--)
         {
-            Node *cur = q.front();
+            Node* current = q.front();
             q.pop();
-            cout << cur->key << ' ';
-            if (cur->left)
-                q.push(cur->left);
-            if (cur->right)
-                q.push(cur->right);
+
+            cout << current->data << " ";
+
+            if (current->left)
+                q.push(current->left);
+
+            if (current->right)
+                q.push(current->right);
         }
-        cout << "\n";
+
+        cout << endl;
     }
-    return 0;
 }
 
 
@@ -61,5 +78,9 @@ int main()
 // Space Complexity: O(W) where W is max width
 
 // Example Input:
-// 5
-// 5 3 7 1 9
+// Enter number of nodes: 5
+// Enter node 1: 5
+// Enter node 2: 3
+// Enter node 3: 7
+// Enter node 4: 1
+// Enter node 5: 9

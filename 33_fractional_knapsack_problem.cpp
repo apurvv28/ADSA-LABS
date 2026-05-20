@@ -5,49 +5,76 @@ using namespace std;
 
 struct Item
 {
-    double v, w;
+    int value;
+    int weight;
 };
+
+bool compare(Item a, Item b)
+{
+    double r1 =
+        (double)a.value / a.weight;
+
+    double r2 =
+        (double)b.value / b.weight;
+
+    return r1 > r2;
+}
+
+double fractionalKnapsack(vector<Item> &items,
+                          int capacity)
+{
+    sort(items.begin(),
+         items.end(),
+         compare);
+
+    double profit = 0;
+
+    for (Item item : items)
+    {
+        if (capacity >= item.weight)
+        {
+            profit += item.value;
+
+            capacity -= item.weight;
+        }
+
+        else
+        {
+            profit +=
+                ((double)item.value /
+                 item.weight) *
+                capacity;
+
+            break;
+        }
+    }
+
+    return profit;
+}
 
 int main()
 {
-    int n;
-    double cap;
-    cin >> n >> cap;
-    vector<Item> a(n);
+    int n, capacity;
+    cout << "Enter number of items and knapsack capacity: ";
+    cin >> n >> capacity;
+
+    vector<Item> items(n);
+
     for (int i = 0; i < n; i++)
-        cin >> a[i].v >> a[i].w;
-
-    sort(a.begin(), a.end(), [](const Item &x, const Item &y)
-         { return (x.v / x.w) > (y.v / y.w); });
-
-    double profit = 0;
-    for (auto &it : a)
     {
-        if (cap <= 0)
-            break;
-        if (it.w <= cap)
-        {
-            profit += it.v;
-            cap -= it.w;
-        }
-        else
-        {
-            profit += (it.v / it.w) * cap;
-            cap = 0;
-        }
+        cout << "Enter value and weight of item " << (i+1) << ": ";
+        cin >> items[i].value >> items[i].weight;
     }
-    cout.setf(std::ios::fixed);
-    cout.precision(6);
-    cout << profit << "\n";
-    return 0;
-}
 
+    cout << "Maximum Profit: ";
+    cout << fractionalKnapsack(items, capacity);
+}
 
 // Time Complexity: O(N log N)
 // Space Complexity: O(1)
 
 // Example Input:
-// 3 50
-// 60 10
-// 100 20
-// 120 30
+// Enter number of items and knapsack capacity: 3 50
+// Enter value and weight of item 1: 60 10
+// Enter value and weight of item 2: 100 20
+// Enter value and weight of item 3: 120 30

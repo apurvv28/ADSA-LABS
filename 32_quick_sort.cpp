@@ -2,49 +2,69 @@
 #include <vector>
 using namespace std;
 
-struct Rec
+int partition(vector<int>& arr,
+              int low,
+              int high)
 {
-    int roll;
-    int credit;
-};
+    int pivot = arr[high];
 
-int part(vector<Rec> &a, int l, int r)
-{
-    int pivot = a[r].credit;
-    int i = l - 1;
-    for (int j = l; j < r; j++)
+    int i = low - 1;
+
+    for (int j = low; j < high; j++)
     {
-        if (a[j].credit <= pivot)
+        if (arr[j] < pivot)
         {
             i++;
-            swap(a[i], a[j]);
+
+            swap(arr[i], arr[j]);
         }
     }
-    swap(a[i + 1], a[r]);
+
+    swap(arr[i + 1], arr[high]);
+
     return i + 1;
 }
 
-void quickSort(vector<Rec> &a, int l, int r)
+void quickSort(vector<int>& arr,
+               int low,
+               int high)
 {
-    if (l >= r)
-        return;
-    int p = part(a, l, r);
-    quickSort(a, l, p - 1);
-    quickSort(a, p + 1, r);
+    if (low < high)
+    {
+        int pivotIndex =
+            partition(arr, low, high);
+
+        quickSort(arr,
+                  low,
+                  pivotIndex - 1);
+
+        quickSort(arr,
+                  pivotIndex + 1,
+                  high);
+    }
 }
 
 int main()
 {
     int n;
+    cout << "Enter number of elements: ";
     cin >> n;
-    vector<Rec> a(n);
+
+    vector<int> arr(n);
+
     for (int i = 0; i < n; i++)
-        cin >> a[i].roll >> a[i].credit;
-    if (n > 0)
-        quickSort(a, 0, n - 1);
-    for (int i = 0; i < n; i++)
-        cout << a[i].roll << " " << a[i].credit << "\n";
-    return 0;
+    {
+        cout << "Enter element " << (i+1) << ": ";
+        cin >> arr[i];
+    }
+
+    quickSort(arr, 0, n - 1);
+
+    cout << "\nSorted Array: ";
+    for (int x : arr)
+    {
+        cout << x << " ";
+    }
 }
 
 
@@ -52,5 +72,9 @@ int main()
 // Space Complexity: O(log N)
 
 // Example Input:
-// 5
-// 5 4 3 2 1
+// Enter number of elements: 5
+// Enter element 1: 5
+// Enter element 2: 4
+// Enter element 3: 3
+// Enter element 4: 2
+// Enter element 5: 1

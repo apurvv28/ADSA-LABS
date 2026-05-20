@@ -5,72 +5,96 @@ using namespace std;
 
 struct Edge
 {
-    int u, v, w;
+    int u;
+    int v;
+    int weight;
 };
 
-struct DSU
+int parent[100];
+
+bool compare(Edge a, Edge b)
 {
-    vector<int> p, r;
-    DSU(int n) : p(n), r(n, 0)
+    return a.weight < b.weight;
+}
+
+int findParent(int node)
+{
+    if (parent[node] == node)
     {
-        for (int i = 0; i < n; i++)
-            p[i] = i;
+        return node;
     }
-    int find(int x) { return p[x] == x ? x : p[x] = find(p[x]); }
-    bool unite(int a, int b)
+
+    return findParent(parent[node]);
+}
+
+void unionSet(int a, int b)
+{
+    int parentA = findParent(a);
+
+    int parentB = findParent(b);
+
+    parent[parentB] = parentA;
+}
+
+void kruskal(int vertices, vector<Edge> &edges)
+{
+    sort(edges.begin(), edges.end(), compare);
+
+    for (int i = 0; i < vertices; i++)
     {
-        a = find(a);
-        b = find(b);
-        if (a == b)
-            return false;
-        if (r[a] < r[b])
-            swap(a, b);
-        p[b] = a;
-        if (r[a] == r[b])
-            r[a]++;
-        return true;
+        parent[i] = i;
     }
-};
+
+    int totalCost = 0;
+
+    for (Edge e : edges)
+    {
+        int u = findParent(e.u);
+
+        int v = findParent(e.v);
+
+        if (u != v)
+        {
+            cout << e.u
+                 << " - "
+                 << e.v
+                 << " = "
+                 << e.weight
+                 << endl;
+
+            totalCost += e.weight;
+
+            unionSet(u, v);
+        }
+    }
+
+    cout << "Cost = " << totalCost;
+}
 
 int main()
 {
-    int V, E;
-    cin >> V >> E;
-    vector<Edge> edges;
-    edges.reserve(E);
-    for (int i = 0; i < E; i++)
-    {
-        int u, v, w;
-        cin >> u >> v >> w;
-        edges.push_back({u, v, w});
-    }
-    sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b)
-         { return a.w < b.w; });
+    int vertices, edgesCount;
+    cout << "Enter number of vertices and edges: ";
+    cin >> vertices >> edgesCount;
 
-    DSU dsu(V);
-    long long cost = 0;
-    for (auto &e : edges)
+    vector<Edge> edges(edgesCount);
+
+    for (int i = 0; i < edgesCount; i++)
     {
-        if (e.u < 0 || e.u >= V || e.v < 0 || e.v >= V)
-            continue;
-        if (dsu.unite(e.u, e.v))
-        {
-            cost += e.w;
-            cout << e.u << " " << e.v << " " << e.w << "\n";
-        }
+        cout << "Enter edge " << (i+1) << " (u v weight): ";
+        cin >> edges[i].u >> edges[i].v >> edges[i].weight;
     }
-    cout << cost << "\n";
-    return 0;
+
+    kruskal(vertices, edges);
 }
-
 
 // Time Complexity: O(E log E)
 // Space Complexity: O(V)
 
 // Example Input:
-// 4 5
-// 0 1 10
-// 1 2 15
-// 2 3 20
-// 3 0 25
-// 0 2 30
+// Enter number of vertices and edges: 4 5
+// Enter edge 1 (u v weight): 0 1 10
+// Enter edge 2 (u v weight): 1 2 15
+// Enter edge 3 (u v weight): 2 3 20
+// Enter edge 4 (u v weight): 3 0 25
+// Enter edge 5 (u v weight): 0 2 30
