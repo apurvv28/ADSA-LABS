@@ -2,66 +2,38 @@
 #include <vector>
 #include <list>
 using namespace std;
-
-void insert(vector<list<pair<long long, string>>>& table,
-            int size,
-            string name,
-            long long phone)
-{
+void insert(vector<list<pair<long long, string>>>& table,int size,string name,long long phone){
     int index = phone % size;
-
     table[index].push_back({phone, name});
 }
-
-void search(vector<list<pair<long long, string>>>& table,
-            int size,
-            long long phone)
-{
+void search(vector<list<pair<long long, string>>>& table,int size,long long phone){
     int index = phone % size;
-
-    for (auto data : table[index])
-    {
-        if (data.first == phone)
-        {
-            cout << data.second
-                 << endl;
-
+    for (auto data : table[index]){
+        if (data.first == phone){
+            cout << data.second<< endl;
             return;
         }
     }
-
     cout << "NOT FOUND" << endl;
 }
-
-int main()
-{
+int main(){
     int size, n;
     cout << "Enter table size and number of entries: ";
     cin >> size >> n;
-
     vector<list<pair<long long, string>>> table(size);
-
-    for (int i = 0; i < n; i++)
-    {
+    for (int i = 0; i < n; i++){
         string name;
         long long phone;
-
         cout << "Enter name and phone of entry " << (i+1) << ": ";
         cin >> name >> phone;
-
         insert(table, size, name, phone);
     }
-
     long long phone;
-
     cout << "\nEnter phone numbers to search (enter -1 to exit):\n";
-    while (cin >> phone)
-    {
-        if (phone == -1)
-        {
+    while (cin >> phone){
+        if (phone == -1){
             break;
         }
-
         search(table, size, phone);
     }
 }
