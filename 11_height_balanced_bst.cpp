@@ -6,7 +6,6 @@ struct Node
     int data;
     Node *left;
     Node *right;
-
     Node(int value)
     {
         data = value;
@@ -15,89 +14,60 @@ struct Node
     }
 };
 
-Node *insert(Node *root, int value)
-{
-    if (root == NULL)
-    {
+Node *insert(Node *root, int value){
+    if (root == NULL){
         return new Node(value);
     }
-
-    if (value < root->data)
-    {
+    if (value < root->data){
         root->left = insert(root->left, value);
     }
-
-    else if (value > root->data)
-    {
+    else if (value > root->data){
         root->right = insert(root->right, value);
     }
-
     return root;
 }
 
-int checkBalance(Node *root)
-{
-    if (root == NULL)
-    {
+int checkBalance(Node *root){
+    if (root == NULL){
         return 0;
     }
-
     int leftHeight = checkBalance(root->left);
-
-    if (leftHeight == -1)
-    {
+    if (leftHeight == -1){
         return -1;
     }
-
     int rightHeight = checkBalance(root->right);
-
-    if (rightHeight == -1)
-    {
+    if (rightHeight == -1){
         return -1;
     }
-
     int diff = leftHeight - rightHeight;
-
-    if (diff < 0)
-    {
+    if (diff < 0){
         diff = -diff;
     }
-
-    if (diff > 1)
-    {
+    if (diff > 1){
         return -1;
     }
-
-    if (leftHeight > rightHeight)
-    {
+    if (leftHeight > rightHeight){
         return leftHeight + 1;
     }
-
     return rightHeight + 1;
 }
 
-int main()
-{
+int main(){
     int n;
     cout << "Enter number of nodes: ";
     cin >> n;
-
     Node *root = NULL;
-
-    for (int i = 0; i < n; i++)
-    {
+    for (int i = 0; i < n; i++){
         int value;
-        cout << "Enter node " << (i+1) << ": ";
+        cout << "Enter node " << (i + 1) << ": ";
         cin >> value;
         root = insert(root, value);
     }
     cout << "\nResult: ";
-    if (checkBalance(root) == -1)
-    {
+    if (checkBalance(root) == -1){
         cout << "NOT BALANCED";
     }
-    else
-    {
+    else{
         cout << "BALANCED";
     }
 }

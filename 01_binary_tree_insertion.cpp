@@ -16,50 +16,55 @@ struct Node
     }
 };
 
-int main()
+// Function to insert node in Binary Tree
+Node* insert(Node* root, int value)
 {
-    int n;
-    cout << "Enter number of nodes: ";
-    cin >> n;
+    Node* newNode = new Node(value);
 
-    if (n == 0)
-        return 0;
-
-    int value;
-    cout << "Enter root value: ";
-    cin >> value;
-
-    Node* root = new Node(value);
+    if (root == NULL)
+        return newNode;
 
     queue<Node*> q;
     q.push(root);
 
-    int count = 1;
-
-    while (count < n)
+    while (!q.empty())
     {
         Node* current = q.front();
         q.pop();
 
-        cout << "Enter left child: ";
-        cin >> value;
-        current->left = new Node(value);
-        q.push(current->left);
-        count++;
-
-        if (count < n)
+        if (current->left == NULL)
         {
-            cout << "Enter right child: ";
-            cin >> value;
-            current->right = new Node(value);
+            current->left = newNode;
+            return root;
+        }
+        else
+        {
+            q.push(current->left);
+        }
+
+        if (current->right == NULL)
+        {
+            current->right = newNode;
+            return root;
+        }
+        else
+        {
             q.push(current->right);
-            count++;
         }
     }
 
+    return root;
+}
+
+// Function for Level Order Traversal
+void levelOrder(Node* root)
+{
+    if (root == NULL)
+        return;
+
+    queue<Node*> q;
     q.push(root);
 
-    cout << "\nLevel Order Traversal: ";
     while (!q.empty())
     {
         Node* current = q.front();
@@ -75,13 +80,42 @@ int main()
     }
 }
 
-// Time Complexity: O(N)
-// Space Complexity: O(W) where W is maximum width
+int main()
+{
+    int n, value;
 
-// Example Input:
-// Enter number of nodes: 5
-// Enter root value: 1
-// Enter left child: 2
-// Enter left child: 4
-// Enter right child: 5
-// Enter right child: 3
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    Node* root = NULL;
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Enter value: ";
+        cin >> value;
+
+        root = insert(root, value);
+    }
+
+    cout << "\nLevel Order Traversal: ";
+    levelOrder(root);
+
+    return 0;
+}
+
+/*
+Time Complexity:
+Insertion  -> O(N)
+Traversal  -> O(N)
+
+Example Input:
+Enter number of nodes: 5
+Enter value: 1
+Enter value: 2
+Enter value: 3
+Enter value: 4
+Enter value: 5
+
+Output:
+Level Order Traversal: 1 2 3 4 5
+*/

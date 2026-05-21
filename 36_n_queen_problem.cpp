@@ -1,112 +1,104 @@
 #include <iostream>
-#include <vector>
 using namespace std;
-
-bool isSafe(vector<string>& board,
-            int row,
-            int col,
-            int n)
+#define MAX 10
+int board[MAX][MAX];
+int n;
+bool isSafe(int row, int col)
 {
     for (int i = 0; i < row; i++)
     {
-        if (board[i][col] == 'Q')
+        if (board[i][col] == 1)
         {
             return false;
         }
     }
-
-    int i = row;
-    int j = col;
-
-    while (i >= 0 && j >= 0)
+    for (int i = row, j = col;
+         i >= 0 && j >= 0;
+         i--, j--)
     {
-        if (board[i][j] == 'Q')
+        if (board[i][j] == 1)
         {
             return false;
         }
-
-        i--;
-        j--;
     }
-
-    i = row;
-    j = col;
-
-    while (i >= 0 && j < n)
+    for (int i = row, j = col;
+         i >= 0 && j < n;
+         i--, j++)
     {
-        if (board[i][j] == 'Q')
+        if (board[i][j] == 1)
         {
             return false;
         }
-
-        i--;
-        j++;
     }
-
     return true;
 }
-
-bool solve(vector<string>& board,
-           int row,
-           int n)
+bool solveNQueens(int row)
 {
     if (row == n)
     {
         return true;
     }
-
     for (int col = 0; col < n; col++)
     {
-        if (isSafe(board,
-                   row,
-                   col,
-                   n))
+        if (isSafe(row, col))
         {
-            board[row][col] = 'Q';
-
-            if (solve(board,
-                      row + 1,
-                      n))
+            board[row][col] = 1;
+            if (solveNQueens(row + 1))
             {
                 return true;
             }
-
-            board[row][col] = '.';
+            board[row][col] = 0;
         }
     }
-
     return false;
 }
-
-int main()
+void printBoard()
 {
-    int n;
-    cout << "Enter board size (N): ";
-    cin >> n;
-
-    vector<string> board(
-        n,
-        string(n, '.'));
-
-    cout << "\nN-Queens Solution:" << endl;
-    if (solve(board, 0, n))
+    cout << "\nSolution:\n";
+    for (int i = 0; i < n; i++)
     {
-        for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
         {
-            cout << board[i]
-                 << endl;
+            if (board[i][j] == 1)
+            {
+                cout << "Q ";
+            }
+            else
+            {
+                cout << ". ";
+            }
         }
-    }
-
-    else
-    {
-        cout << "No Solution";
+        cout << endl;
     }
 }
+int main()
+{
+    cout << "Enter value of N: ";
+    cin >> n;
+    if (solveNQueens(0))
+    {
+        printBoard();
+    }
+    else
+    {
+        cout << "No Solution Exists";
+    }
+    return 0;
+}
 
+/*
+Example Input:
+4
 
-// Time Complexity: O(N!)
-// Space Complexity: O(N)
+Output:
+. Q . .
+. . . Q
+Q . . .
+. . Q .
 
-// Example Input:
-// Enter board size (N): 4
+Time Complexity:
+O(N!)
+
+Space Complexity:
+O(N^2)
+*/
